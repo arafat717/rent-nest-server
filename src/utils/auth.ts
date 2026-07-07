@@ -7,6 +7,7 @@ import { JwtPayload } from "jsonwebtoken";
 import { prisma } from "../lib/prisma";
 
 export const auth = (...userRoles: Role[]) => {
+  console.log("userRoles", userRoles);
   return catchAsync(async (req: Request, res: Response, next: NextFunction) => {
     const token = req.cookies.accessToken
       ? req.cookies.accessToken
@@ -24,12 +25,13 @@ export const auth = (...userRoles: Role[]) => {
       throw new Error(verifyedToken.error);
     }
     const { email, name, role, id } = verifyedToken.data as JwtPayload;
-    if (!userRoles.length && userRoles.includes(role)) {
+    console.log("current user role", role);
+    if (userRoles.length && !userRoles.includes(role)) {
       return res.status(403).json({
         success: false,
         statusCode: 403,
         message:
-          "Frobidden. You don't have permission to access this resource.",
+          "Forbidden. You don't have permission to access this resource.",
       });
     }
 

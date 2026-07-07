@@ -5,6 +5,7 @@ import config from "./config";
 import { userRoute } from "./modules/user/user.route";
 import { globalErrorHandler } from "./middleware/globalErrorHandler";
 import { notFoundPage } from "./middleware/notFoundPage";
+import { categoryRoute } from "./modules/category/category.route";
 
 const app = express();
 
@@ -25,6 +26,7 @@ app.get("/", async (req: Request, res: Response) => {
 // STRIP_PRODUCT_ID=prod_UomtroxhuY6R36
 
 app.use("/api/users", userRoute);
+app.use("/api/category", categoryRoute);
 
 app.use(notFoundPage);
 app.use(globalErrorHandler);
