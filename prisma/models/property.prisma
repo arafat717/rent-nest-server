@@ -1,0 +1,37 @@
+model Property {
+  id            String         @id @default(uuid())
+  title         String
+  description   String
+  type          PropertyType
+  status        PropertyStatus @default(AVAILABLE)
+
+  price         Float
+  bedrooms      Int
+  bathrooms     Int
+  areaSqft      Float?
+
+  location      String
+  city          String
+  address       String
+  latitude      Float?
+  longitude     Float?
+
+  amenities     String[]       // e.g. ["wifi", "parking", "ac"]
+  images        String[]       // Cloudinary URLs
+
+  landlordId    String
+  landlord      User           @relation("LandlordProperties", fields: [landlordId], references: [id])
+
+  categoryId    String
+  category      Category       @relation(fields: [categoryId], references: [id])
+
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+
+  // Relations
+  rentalRequests RentalRequest[]
+  reviews        Review[]
+
+  @@index([city, price, type])
+  @@map("properties")
+}
