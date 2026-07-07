@@ -6,6 +6,7 @@ import { userRoute } from "./modules/user/user.route";
 import { globalErrorHandler } from "./middleware/globalErrorHandler";
 import { notFoundPage } from "./middleware/notFoundPage";
 import { categoryRoute } from "./modules/category/category.route";
+import { propertyRoute } from "./modules/property/property.route";
 
 const app = express();
 
@@ -27,6 +28,7 @@ app.get("/", async (req: Request, res: Response) => {
 
 app.use("/api/users", userRoute);
 app.use("/api/category", categoryRoute);
+app.use("/api/properties", propertyRoute);
 
 app.use(notFoundPage);
 app.use(globalErrorHandler);
