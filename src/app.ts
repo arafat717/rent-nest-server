@@ -3,7 +3,6 @@ import express, { NextFunction, Request, Response } from "express";
 import cors from "cors";
 import config from "./config";
 import { userRoute } from "./modules/user/user.route";
-import { authRoute } from "./modules/auth/auth.route";
 import { globalErrorHandler } from "./middleware/globalErrorHandler";
 import { notFoundPage } from "./middleware/notFoundPage";
 
@@ -20,13 +19,12 @@ app.use(
 );
 
 app.get("/", async (req: Request, res: Response) => {
-  res.send("Hello World!");
+  res.send("Rent nest server running!");
 });
 
 // STRIP_PRODUCT_ID=prod_UomtroxhuY6R36
 
 app.use("/api/users", userRoute);
-app.use("/api/auth", authRoute);
 
 app.use(notFoundPage);
 app.use(globalErrorHandler);
