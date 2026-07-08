@@ -1,8 +1,8 @@
-import { prisma } from "../../lib/prisma";
 import {
   TRentalRequest,
   TRentalRequestStatusUpdate,
 } from "./rentalRequest.interface";
+import { prisma } from "../../lib/prisma";
 
 const createRentalRequestIntoDb = async (
   tenantId: string,
@@ -48,7 +48,7 @@ const createRentalRequestIntoDb = async (
 const getMyRentalRequestsFromDb = async (tenantId: string) => {
   const requests = await prisma.rentalRequest.findMany({
     where: { tenantId },
-    include: { property: true },
+    include: { property: true, payment: true },
     orderBy: { createdAt: "desc" },
   });
 
@@ -64,12 +64,10 @@ const getSingleRentalRequestFromDb = async (
     where: { id },
     include: {
       property: true,
-      tenant: { select: { id: true, name: true, email: true } },
-      // payment: true,
+      tenant: { select: { id: true, name: true, email: true, phone: true } },
+      payment: true,
     },
   });
-
-  console.log("request", request);
 
   if (!request) {
     throw new Error("Rental request not found");
@@ -86,16 +84,15 @@ const getSingleRentalRequestFromDb = async (
 };
 
 const getLandlordRequestsFromDb = async (landlordId: string) => {
-  console.log("landlordId from rental get-->", landlordId);
   const requests = await prisma.rentalRequest.findMany({
     where: { property: { landlordId } },
     include: {
       property: true,
-      tenant: { select: { id: true, name: true, email: true } },
+      tenant: { select: { id: true, name: true, email: true, phone: true } },
     },
     orderBy: { createdAt: "desc" },
   });
-  console.log("requests from rental get-->", requests);
+
   return requests;
 };
 
@@ -152,11 +149,11 @@ const completeRentalRequestIntoDb = async (id: string, landlordId: string) => {
     throw new Error("You are not allowed to update this rental request");
   }
 
-  // Without payment integration, a completed rental can be marked directly
-  // from APPROVED. Once payment is added, gate this behind status === "ACTIVE".
-  if (request.status !== "APPROVED" && request.status !== "ACTIVE") {
+  // Payment is now integrated: a rental must be paid (status ACTIVE) before
+  // it can be marked completed. APPROVED alone is no longer enough.
+  if (request.status !== "ACTIVE") {
     throw new Error(
-      "Only an approved or active rental request can be marked as completed",
+      "Only a paid (active) rental request can be marked as completed",
     );
   }
 

@@ -17,6 +17,7 @@ model RentalRequest {
   updatedAt    DateTime           @updatedAt
 
   // Relations
+  payment      Payment?
   review       Review?
 
   @@index([tenantId, status])

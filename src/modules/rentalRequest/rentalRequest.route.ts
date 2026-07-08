@@ -31,7 +31,7 @@ router.get(
 );
 router.patch(
   "/requests/:id",
-  auth(Role.ADMIN, Role.LANDLORD),
+  auth(Role.LANDLORD),
   rentalRequestController.updateRentalRequestStatus,
 );
 

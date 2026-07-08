@@ -10,6 +10,7 @@ import { propertyRoute } from "./modules/property/property.route";
 import { rentalRequestRoute } from "./modules/rentalRequest/rentalRequest.route";
 import { reviewRoute } from "./modules/review/review.route";
 import { adminRoute } from "./modules/admin/admin.route";
+import { paymentRoute } from "./modules/payment/payment.route";
 
 const app = express();
 
@@ -35,6 +36,7 @@ app.use("/api/properties", propertyRoute);
 app.use("/api/rentals", rentalRequestRoute);
 app.use("/api/reviews", reviewRoute);
 app.use("/api/admin", adminRoute);
+app.use("/api/paymets", paymentRoute);
 
 app.use(notFoundPage);
 app.use(globalErrorHandler);
