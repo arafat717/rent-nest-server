@@ -7,6 +7,9 @@ import { globalErrorHandler } from "./middleware/globalErrorHandler";
 import { notFoundPage } from "./middleware/notFoundPage";
 import { categoryRoute } from "./modules/category/category.route";
 import { propertyRoute } from "./modules/property/property.route";
+import { rentalRequestRoute } from "./modules/rentalRequest/rentalRequest.route";
+import { reviewRoute } from "./modules/review/review.route";
+import { adminRoute } from "./modules/admin/admin.route";
 
 const app = express();
 
@@ -29,6 +32,9 @@ app.get("/", async (req: Request, res: Response) => {
 app.use("/api/users", userRoute);
 app.use("/api/category", categoryRoute);
 app.use("/api/properties", propertyRoute);
+app.use("/api/rentals", rentalRequestRoute);
+app.use("/api/reviews", reviewRoute);
+app.use("/api/admin", adminRoute);
 
 app.use(notFoundPage);
 app.use(globalErrorHandler);

@@ -1,6 +1,8 @@
-
 import { prisma } from "../../lib/prisma";
-import { TRentalRequest, TRentalRequestStatusUpdate } from "./rentalRequest.interface";
+import {
+  TRentalRequest,
+  TRentalRequestStatusUpdate,
+} from "./rentalRequest.interface";
 
 const createRentalRequestIntoDb = async (
   tenantId: string,
@@ -46,7 +48,7 @@ const createRentalRequestIntoDb = async (
 const getMyRentalRequestsFromDb = async (tenantId: string) => {
   const requests = await prisma.rentalRequest.findMany({
     where: { tenantId },
-    include: { property: true, payment: true },
+    include: { property: true },
     orderBy: { createdAt: "desc" },
   });
 
@@ -62,10 +64,12 @@ const getSingleRentalRequestFromDb = async (
     where: { id },
     include: {
       property: true,
-      tenant: { select: { id: true, name: true, email: true, phone: true } },
-      payment: true,
+      tenant: { select: { id: true, name: true, email: true } },
+      // payment: true,
     },
   });
+
+  console.log("request", request);
 
   if (!request) {
     throw new Error("Rental request not found");
@@ -82,15 +86,16 @@ const getSingleRentalRequestFromDb = async (
 };
 
 const getLandlordRequestsFromDb = async (landlordId: string) => {
+  console.log("landlordId from rental get-->", landlordId);
   const requests = await prisma.rentalRequest.findMany({
     where: { property: { landlordId } },
     include: {
       property: true,
-      tenant: { select: { id: true, name: true, email: true, phone: true } },
+      tenant: { select: { id: true, name: true, email: true } },
     },
     orderBy: { createdAt: "desc" },
   });
-
+  console.log("requests from rental get-->", requests);
   return requests;
 };
 
@@ -112,6 +117,12 @@ const updateRentalRequestStatusIntoDb = async (
     throw new Error("You are not allowed to update this rental request");
   }
 
+  if (request.status !== "PENDING") {
+    throw new Error(
+      `Cannot ${payload.status.toLowerCase()} a request that is already ${request.status.toLowerCase()}`,
+    );
+  }
+
   if (payload.status === "REJECTED" && !payload.rejectReason) {
     throw new Error("A reason is required to reject a rental request");
   }
@@ -120,17 +131,45 @@ const updateRentalRequestStatusIntoDb = async (
     where: { id },
     data: {
       status: payload.status,
-      rejectReason: payload.rejectReason,
+      rejectReason: payload.status === "REJECTED" ? payload.rejectReason : null,
     },
   });
 
-  // When a landlord marks a rental completed, free up the property again
-  if (payload.status === "COMPLETED") {
-    await prisma.property.update({
-      where: { id: request.propertyId },
-      data: { status: "AVAILABLE" },
-    });
+  return updatedRequest;
+};
+
+const completeRentalRequestIntoDb = async (id: string, landlordId: string) => {
+  const request = await prisma.rentalRequest.findUnique({
+    where: { id },
+    include: { property: true },
+  });
+
+  if (!request) {
+    throw new Error("Rental request not found");
   }
+
+  if (request.property.landlordId !== landlordId) {
+    throw new Error("You are not allowed to update this rental request");
+  }
+
+  // Without payment integration, a completed rental can be marked directly
+  // from APPROVED. Once payment is added, gate this behind status === "ACTIVE".
+  if (request.status !== "APPROVED" && request.status !== "ACTIVE") {
+    throw new Error(
+      "Only an approved or active rental request can be marked as completed",
+    );
+  }
+
+  const updatedRequest = await prisma.rentalRequest.update({
+    where: { id },
+    data: { status: "COMPLETED" },
+  });
+
+  // Free up the property again once the rental is done
+  await prisma.property.update({
+    where: { id: request.propertyId },
+    data: { status: "AVAILABLE" },
+  });
 
   return updatedRequest;
 };
@@ -141,4 +180,5 @@ export const rentalRequestService = {
   getSingleRentalRequestFromDb,
   getLandlordRequestsFromDb,
   updateRentalRequestStatusIntoDb,
+  completeRentalRequestIntoDb,
 };

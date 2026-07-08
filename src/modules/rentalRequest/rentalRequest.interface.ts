@@ -6,6 +6,6 @@ export type TRentalRequest = {
 };
 
 export type TRentalRequestStatusUpdate = {
-  status: "APPROVED" | "REJECTED" | "COMPLETED";
+  status: "APPROVED" | "REJECTED";
   rejectReason?: string;
 };

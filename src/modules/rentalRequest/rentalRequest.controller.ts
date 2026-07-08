@@ -86,10 +86,29 @@ const updateRentalRequestStatus = catchAsync(
   },
 );
 
+const completeRentalRequest = catchAsync(
+  async (req: Request, res: Response) => {
+    const { id } = req.params;
+    const landlordId = req.user!.id;
+    const request = await rentalRequestService.completeRentalRequestIntoDb(
+      id as string,
+      landlordId,
+    );
+
+    sentResponse(res, {
+      success: true,
+      statusCode: httpsStatus.OK,
+      message: "Rental request marked as completed successfully!",
+      data: request,
+    });
+  },
+);
+
 export const rentalRequestController = {
   createRentalRequest,
   getMyRentalRequests,
   getSingleRentalRequest,
   getLandlordRequests,
   updateRentalRequestStatus,
+  completeRentalRequest,
 };
