@@ -1,4 +1,3 @@
-
 import { TCreatePayment, TConfirmPayment } from "./payment.interface";
 import { prisma } from "../../lib/prisma";
 import { stripe } from "../../config/stripe";
@@ -37,6 +36,7 @@ const createPaymentIntoDb = async (
   const paymentIntent = await stripe.paymentIntents.create({
     amount: Math.round(amount * 100), // Stripe expects the smallest currency unit (cents)
     currency: "usd",
+    payment_method_types: ["card"],
     metadata: {
       rentalRequestId: rentalRequest.id,
       tenantId,
