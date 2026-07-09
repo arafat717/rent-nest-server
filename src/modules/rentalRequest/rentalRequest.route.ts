@@ -5,19 +5,16 @@ import { Role } from "../../../generated/prisma/enums";
 
 const router = Router();
 
-// POST /api/rentals - tenant submits a request
+
 router.post(
   "/",
   auth(Role.TENANT),
   rentalRequestController.createRentalRequest,
 );
 
-// GET /api/rentals - tenant's own requests
+
 router.get("/", auth(Role.TENANT), rentalRequestController.getMyRentalRequests);
 
-// GET /api/rentals/:id - request details (tenant, landlord, or admin)
-
-// rentals
 
 router.get(
   "/requests",
