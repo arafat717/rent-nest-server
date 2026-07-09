@@ -24,6 +24,7 @@ router.get(
   auth(Role.LANDLORD),
   rentalRequestController.getLandlordRequests,
 );
+
 router.get(
   "/:id",
   auth(Role.TENANT, Role.LANDLORD, Role.ADMIN),

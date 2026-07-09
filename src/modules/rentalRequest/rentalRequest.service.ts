@@ -48,7 +48,7 @@ const createRentalRequestIntoDb = async (
 const getMyRentalRequestsFromDb = async (tenantId: string) => {
   const requests = await prisma.rentalRequest.findMany({
     where: { tenantId },
-    include: { property: true, payment: true },
+    include: { property: true },
     orderBy: { createdAt: "desc" },
   });
 
@@ -65,7 +65,6 @@ const getSingleRentalRequestFromDb = async (
     include: {
       property: true,
       tenant: { select: { id: true, name: true, email: true, phone: true } },
-      payment: true,
     },
   });
 

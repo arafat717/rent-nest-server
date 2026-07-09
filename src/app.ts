@@ -36,7 +36,7 @@ app.use("/api/properties", propertyRoute);
 app.use("/api/rentals", rentalRequestRoute);
 app.use("/api/reviews", reviewRoute);
 app.use("/api/admin", adminRoute);
-app.use("/api/paymets", paymentRoute);
+app.use("/api/payments", paymentRoute);
 
 app.use(notFoundPage);
 app.use(globalErrorHandler);
