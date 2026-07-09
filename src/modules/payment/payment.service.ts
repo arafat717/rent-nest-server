@@ -2,8 +2,6 @@ import { TCreatePayment, TConfirmPayment } from "./payment.interface";
 import { prisma } from "../../lib/prisma";
 import { stripe } from "../../config/stripe";
 
-// Stripe's official test payment method for card payments that always succeed.
-// Docs: https://docs.stripe.com/testing
 const DEFAULT_TEST_PAYMENT_METHOD = "pm_card_visa";
 
 const createPaymentIntoDb = async (
@@ -34,7 +32,7 @@ const createPaymentIntoDb = async (
   const amount = rentalRequest.property.price;
 
   const paymentIntent = await stripe.paymentIntents.create({
-    amount: Math.round(amount * 100), // Stripe expects the smallest currency unit (cents)
+    amount: Math.round(amount * 100), 
     currency: "usd",
     payment_method_types: ["card"],
     metadata: {
