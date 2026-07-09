@@ -148,8 +148,7 @@ const completeRentalRequestIntoDb = async (id: string, landlordId: string) => {
     throw new Error("You are not allowed to update this rental request");
   }
 
-  // Payment is now integrated: a rental must be paid (status ACTIVE) before
-  // it can be marked completed. APPROVED alone is no longer enough.
+
   if (request.status !== "ACTIVE") {
     throw new Error(
       "Only a paid (active) rental request can be marked as completed",
@@ -161,7 +160,7 @@ const completeRentalRequestIntoDb = async (id: string, landlordId: string) => {
     data: { status: "COMPLETED" },
   });
 
-  // Free up the property again once the rental is done
+
   await prisma.property.update({
     where: { id: request.propertyId },
     data: { status: "AVAILABLE" },

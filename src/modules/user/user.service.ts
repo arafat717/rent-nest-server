@@ -100,10 +100,6 @@ const updateMeIntoDb = async (userId: string, payload: TUpdateUser) => {
     throw new Error("User not found");
   }
 
-  // Deliberately whitelisted fields only. Email, password, and role are
-  // excluded here on purpose - they need their own dedicated, more careful
-  // endpoints (e.g. password change requires verifying the current password,
-  // role change should be admin-only).
   const updatedUser = await prisma.user.update({
     where: { id: userId },
     data: {
