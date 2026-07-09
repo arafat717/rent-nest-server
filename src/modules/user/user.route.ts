@@ -13,4 +13,10 @@ router.get(
   userController.getMe,
 );
 
+router.patch(
+  "/me",
+  auth("TENANT", "LANDLORD", "ADMIN"),
+  userController.updateMe,
+);
+
 export const userRoute = router;

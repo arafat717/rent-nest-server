@@ -1,6 +1,6 @@
 import bcrypt from "bcrypt";
 import jwt, { SignOptions } from "jsonwebtoken";
-import { TUser, TLoginUser } from "./user.interface";
+import { TUser, TLoginUser, TUpdateUser } from "./user.interface";
 import { prisma } from "../../lib/prisma";
 import config from "../../config";
 import { jwtUtils } from "../../utils/jwt";
@@ -93,8 +93,35 @@ const getMeFromDb = async (userId: string) => {
   return user;
 };
 
+const updateMeIntoDb = async (userId: string, payload: TUpdateUser) => {
+  const user = await prisma.user.findUnique({ where: { id: userId } });
+
+  if (!user) {
+    throw new Error("User not found");
+  }
+
+  // Deliberately whitelisted fields only. Email, password, and role are
+  // excluded here on purpose - they need their own dedicated, more careful
+  // endpoints (e.g. password change requires verifying the current password,
+  // role change should be admin-only).
+  const updatedUser = await prisma.user.update({
+    where: { id: userId },
+    data: {
+      name: payload.name,
+      phone: payload.phone,
+      avatar: payload.avatar,
+    },
+    omit: {
+      password: true,
+    },
+  });
+
+  return updatedUser;
+};
+
 export const userService = {
   createUserIntoDb,
   loginUserFromDb,
   getMeFromDb,
+  updateMeIntoDb,
 };
