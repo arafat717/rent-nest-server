@@ -28,7 +28,6 @@ app.get("/", async (req: Request, res: Response) => {
   res.send("Rent nest server running!");
 });
 
-// STRIP_PRODUCT_ID=prod_UomtroxhuY6R36
 
 app.use("/api/users", userRoute);
 app.use("/api/category", categoryRoute);
